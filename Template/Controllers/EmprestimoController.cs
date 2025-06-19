@@ -24,7 +24,7 @@ namespace Emprestimos.Controllers
             {
                 var mensagem = await _emprestimoDomain.InserirEmprestimo(dto);
                 
-                return Ok(new { mensagem });
+                return Ok(mensagem);
             }
             catch (Exception ex)
             {

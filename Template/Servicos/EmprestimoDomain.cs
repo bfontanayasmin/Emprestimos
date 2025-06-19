@@ -19,8 +19,8 @@ namespace Emprestimos.Servicos
             _livrosClient = new LivrosClient();
         }
 
-        
-        public async Task<string> InserirEmprestimo(InserirEmprestimoDTO dto)
+
+        public async Task<object> InserirEmprestimo(InserirEmprestimoDTO dto)
         {
             var livroDisponivel = await _livrosClient.VerificarDisponibilidade(dto.IdLivro);
 
@@ -41,10 +41,14 @@ namespace Emprestimos.Servicos
 
             await _livrosClient.MarcarComoEmprestado(dto.IdLivro);
 
-            return "Empréstimo realizado com sucesso!";
+            return new
+            {
+                Mensagem = "Empréstimo realizado com sucesso!",
+                IdEmprestimo = emprestimo.Id
+            };
         }
 
-        
+
         public async Task<string> AtualizarStatus(int id, AtualizarStatusDTO dto)
         {
             var emprestimo = _dataContext.Emprestimos.FirstOrDefault(e => e.Id == id);
