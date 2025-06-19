@@ -13,22 +13,27 @@ namespace Emprestimos.Servicos
         {
             _http = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:5001/api/") // ✅ ajuste para a URL real do micro de livros
+                BaseAddress = new Uri("http://localhost:5089/api/") // porta do microserviço de livros
             };
         }
 
-        // Verifica se um livro está disponível
+        // ✅ Verifica se o livro está disponível
         public async Task<bool> VerificarDisponibilidade(int idLivro)
         {
             var response = await _http.GetAsync($"livros/{idLivro}");
+
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Erro ao consultar o serviço de livros");
 
             var livro = await response.Content.ReadFromJsonAsync<VerificarLivroDTO>();
-            return livro?.Disponibilidade ?? false;
+
+            if (livro == null)
+                throw new Exception("Livro não encontrado");
+
+            return livro.Disponibilidade;
         }
 
-        // Marca um livro como emprestado (Disponibilidade = false)
+        // ✅ Marca como emprestado (Disponibilidade = false)
         public async Task MarcarComoEmprestado(int idLivro)
         {
             var content = JsonContent.Create(new { disponibilidade = false });
@@ -36,7 +41,7 @@ namespace Emprestimos.Servicos
             response.EnsureSuccessStatusCode();
         }
 
-        // Marca um livro como devolvido (Disponibilidade = true)
+        // ✅ Marca como devolvido (Disponibilidade = true)
         public async Task MarcarComoDevolvido(int idLivro)
         {
             var content = JsonContent.Create(new { disponibilidade = true });
