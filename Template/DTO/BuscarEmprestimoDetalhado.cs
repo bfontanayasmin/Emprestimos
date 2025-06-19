@@ -11,5 +11,6 @@ namespace Emprestimos.DTO
         public StatusEmprestimo Status { get; set; }
 
         public LivroDTO Livro { get; set; }
+        public LeitorDTO Leitor { get; set; }
     }
 }

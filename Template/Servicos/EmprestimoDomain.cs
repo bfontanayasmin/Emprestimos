@@ -101,6 +101,9 @@ namespace Emprestimos.Servicos
 
             var livro = await _livrosClient.BuscarLivroPorId(emprestimo.CodigoLivro);
 
+            var leitoresClient = new LeitoresClient();
+            var leitor = await leitoresClient.BuscarLeitorPorId(emprestimo.CodigoLeitor);
+
             var dto = new BuscarEmprestimoDetalhadoDTO
             {
                 Id = emprestimo.Id,
@@ -108,7 +111,8 @@ namespace Emprestimos.Servicos
                 DataInicio = emprestimo.DataEmprestimo,
                 DataDevolucao = emprestimo.DataDevolucao,
                 Status = emprestimo.Status,
-                Livro = livro
+                Livro = livro,
+                Leitor = leitor
             };
 
             return new DetalheEmprestimoRespostaDTO
@@ -117,6 +121,7 @@ namespace Emprestimos.Servicos
                 Emprestimo = dto
             };
         }
+
 
     }
 }

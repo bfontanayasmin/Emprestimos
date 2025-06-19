@@ -15,20 +15,24 @@ namespace Emprestimos.Controllers
         {
             _emprestimoDomain = new EmprestimoDomain();
         }
+
         [HttpPost]
         public async Task<IActionResult> CriarEmprestimo([FromBody] InserirEmprestimoDTO dto)
         {
             try
             {
                 var resposta = await _emprestimoDomain.InserirEmprestimo(dto);
-                return Ok(resposta);
+                return Ok(new
+                {
+                    mensagem = resposta.Mensagem,
+                    idEmprestimo = resposta.IdEmprestimo
+                });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
-
 
         [HttpPatch("{id}/devolucao")]
         public async Task<IActionResult> DevolverEmprestimo(int id, [FromBody] AtualizarStatusDTO dto)
@@ -61,18 +65,12 @@ namespace Emprestimos.Controllers
                 if (resultado.Emprestimo == null)
                     return NotFound(new { mensagem = resultado.Mensagem });
 
-                return Ok(new DetalheEmprestimoRespostaDTO
-                {
-                    Mensagem = resultado.Mensagem,
-                    Emprestimo = resultado.Emprestimo
-                });
+                return Ok(resultado); // já retorna DetalheEmprestimoRespostaDTO corretamente
             }
             catch (Exception ex)
             {
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
-
-
     }
 }
