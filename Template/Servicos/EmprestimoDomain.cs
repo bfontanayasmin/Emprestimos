@@ -2,7 +2,7 @@
 using Emprestimos.Enums;
 using Emprestimos.DTO;
 using Emprestimos.Infra;
-using Emprestimos.Servicos; // para LivrosClient
+using Emprestimos.Servicos; 
 using System.Linq;
 using Emprestimos.Infra;
 
@@ -19,8 +19,8 @@ namespace Emprestimos.Servicos
             _livrosClient = new LivrosClient();
         }
 
-        // Criar novo empréstimo
-        public async Task InserirEmprestimo(InserirEmprestimoDTO dto)
+        
+        public async Task<string> InserirEmprestimo(InserirEmprestimoDTO dto)
         {
             var livroDisponivel = await _livrosClient.VerificarDisponibilidade(dto.IdLivro);
 
@@ -40,10 +40,12 @@ namespace Emprestimos.Servicos
             await _dataContext.SaveChangesAsync();
 
             await _livrosClient.MarcarComoEmprestado(dto.IdLivro);
+
+            return "Empréstimo realizado com sucesso!";
         }
 
-        // Atualizar status (ex: devolução)
-        public async Task AtualizarStatus(int id, AtualizarStatusDTO dto)
+        
+        public async Task<string> AtualizarStatus(int id, AtualizarStatusDTO dto)
         {
             var emprestimo = _dataContext.Emprestimos.FirstOrDefault(e => e.Id == id);
 
@@ -55,15 +57,17 @@ namespace Emprestimos.Servicos
 
             emprestimo.Status = dto.Status;
             emprestimo.DataDevolucao = dto.DataDevolucao ?? DateTime.Now;
-            emprestimo.Multa = (emprestimo.DataDevolucao > emprestimo.DataEmprestimo.AddDays(14)); // exemplo de lógica de multa
+            emprestimo.Multa = (emprestimo.DataDevolucao > emprestimo.DataEmprestimo.AddDays(14));
 
             await _dataContext.SaveChangesAsync();
 
             if (emprestimo.Status == StatusEmprestimo.Devolvido)
                 await _livrosClient.MarcarComoDevolvido(emprestimo.CodigoLivro);
+
+            return $"{emprestimo.Status}";
         }
 
-        // Listar empréstimos de um leitor
+        
         public List<BuscarEmprestimoDTO> ListarPorLeitor(int idLeitor)
         {
             var emprestimos = _dataContext.Emprestimos

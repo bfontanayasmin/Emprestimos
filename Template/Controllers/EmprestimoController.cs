@@ -16,14 +16,15 @@ namespace Emprestimos.Controllers
             _emprestimoDomain = new EmprestimoDomain();
         }
 
-        // POST /api/emprestimos
+
         [HttpPost]
         public async Task<IActionResult> CriarEmprestimo([FromBody] InserirEmprestimoDTO dto)
         {
             try
             {
-                await _emprestimoDomain.InserirEmprestimo(dto);
-                return StatusCode(201); // Created
+                var mensagem = await _emprestimoDomain.InserirEmprestimo(dto);
+                
+                return Ok(new { mensagem });
             }
             catch (Exception ex)
             {
@@ -31,22 +32,21 @@ namespace Emprestimos.Controllers
             }
         }
 
-        // PATCH /api/emprestimos/{id}/devolucao
+
         [HttpPatch("{id}/devolucao")]
         public async Task<IActionResult> RegistrarDevolucao(int id, [FromBody] AtualizarStatusDTO dto)
         {
             try
             {
                 await _emprestimoDomain.AtualizarStatus(id, dto);
-                return NoContent();
+                return Ok(new { mensagem = "Devolução registrada com sucesso!"});
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { ex.Message });
             }
         }
 
-        // GET /api/emprestimos/leitor/{id}
         [HttpGet("leitor/{id}")]
         public IActionResult ListarPorLeitor(int id)
         {
