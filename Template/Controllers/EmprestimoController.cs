@@ -15,35 +15,32 @@ namespace Emprestimos.Controllers
         {
             _emprestimoDomain = new EmprestimoDomain();
         }
-
-
         [HttpPost]
         public async Task<IActionResult> CriarEmprestimo([FromBody] InserirEmprestimoDTO dto)
         {
             try
             {
-                var mensagem = await _emprestimoDomain.InserirEmprestimo(dto);
-                
-                return Ok(mensagem);
+                var resposta = await _emprestimoDomain.InserirEmprestimo(dto);
+                return Ok(resposta);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
 
         [HttpPatch("{id}/devolucao")]
-        public async Task<IActionResult> RegistrarDevolucao(int id, [FromBody] AtualizarStatusDTO dto)
+        public async Task<IActionResult> DevolverEmprestimo(int id, [FromBody] AtualizarStatusDTO dto)
         {
             try
             {
-                await _emprestimoDomain.AtualizarStatus(id, dto);
-                return Ok(new { mensagem = "Devolução registrada com sucesso!"});
+                var mensagem = await _emprestimoDomain.DevolverEmprestimo(id, dto);
+                return Ok(new { mensagem });
             }
             catch (Exception ex)
             {
-                return NotFound(new { ex.Message });
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
@@ -53,5 +50,29 @@ namespace Emprestimos.Controllers
             var emprestimos = _emprestimoDomain.ListarPorLeitor(id);
             return Ok(emprestimos);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> BuscarEmprestimo(int id)
+        {
+            try
+            {
+                var resultado = await _emprestimoDomain.BuscarEmprestimoDetalhado(id);
+
+                if (resultado.Emprestimo == null)
+                    return NotFound(new { mensagem = resultado.Mensagem });
+
+                return Ok(new DetalheEmprestimoRespostaDTO
+                {
+                    Mensagem = resultado.Mensagem,
+                    Emprestimo = resultado.Emprestimo
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
+            }
+        }
+
+
     }
 }

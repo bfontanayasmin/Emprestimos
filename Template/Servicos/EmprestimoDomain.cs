@@ -2,9 +2,8 @@
 using Emprestimos.Enums;
 using Emprestimos.DTO;
 using Emprestimos.Infra;
-using Emprestimos.Servicos; 
+using Emprestimos.Servicos;
 using System.Linq;
-using Emprestimos.Infra;
 
 namespace Emprestimos.Servicos
 {
@@ -19,8 +18,7 @@ namespace Emprestimos.Servicos
             _livrosClient = new LivrosClient();
         }
 
-
-        public async Task<object> InserirEmprestimo(InserirEmprestimoDTO dto)
+        public async Task<RespostaEmprestimoDTO> InserirEmprestimo(InserirEmprestimoDTO dto)
         {
             var livroDisponivel = await _livrosClient.VerificarDisponibilidade(dto.IdLivro);
 
@@ -41,15 +39,14 @@ namespace Emprestimos.Servicos
 
             await _livrosClient.MarcarComoEmprestado(dto.IdLivro);
 
-            return new
+            return new RespostaEmprestimoDTO
             {
                 Mensagem = "Empréstimo realizado com sucesso!",
                 IdEmprestimo = emprestimo.Id
             };
         }
 
-
-        public async Task<string> AtualizarStatus(int id, AtualizarStatusDTO dto)
+        public async Task<string> DevolverEmprestimo(int id, AtualizarStatusDTO dto)
         {
             var emprestimo = _dataContext.Emprestimos.FirstOrDefault(e => e.Id == id);
 
@@ -59,19 +56,19 @@ namespace Emprestimos.Servicos
             if (emprestimo.Status == StatusEmprestimo.Devolvido)
                 throw new Exception("Este empréstimo já foi devolvido.");
 
-            emprestimo.Status = dto.Status;
+            emprestimo.Status = StatusEmprestimo.Devolvido;
             emprestimo.DataDevolucao = dto.DataDevolucao ?? DateTime.Now;
-            emprestimo.Multa = (emprestimo.DataDevolucao > emprestimo.DataEmprestimo.AddDays(14));
+
+            var prazoLimite = emprestimo.DataEmprestimo.AddDays(14);
+            emprestimo.Multa = emprestimo.DataDevolucao > prazoLimite;
 
             await _dataContext.SaveChangesAsync();
 
-            if (emprestimo.Status == StatusEmprestimo.Devolvido)
-                await _livrosClient.MarcarComoDevolvido(emprestimo.CodigoLivro);
+            await _livrosClient.MarcarComoDevolvido(emprestimo.CodigoLivro);
 
-            return $"{emprestimo.Status}";
+            return "Devolução realizada com sucesso.";
         }
 
-        
         public List<BuscarEmprestimoDTO> ListarPorLeitor(int idLeitor)
         {
             var emprestimos = _dataContext.Emprestimos
@@ -88,5 +85,38 @@ namespace Emprestimos.Servicos
                 Status = e.Status
             }).ToList();
         }
+
+        public async Task<DetalheEmprestimoRespostaDTO> BuscarEmprestimoDetalhado(int id)
+        {
+            var emprestimo = await _dataContext.Emprestimos.FindAsync(id);
+
+            if (emprestimo == null)
+            {
+                return new DetalheEmprestimoRespostaDTO
+                {
+                    Mensagem = "Empréstimo não encontrado.",
+                    Emprestimo = null
+                };
+            }
+
+            var livro = await _livrosClient.BuscarLivroPorId(emprestimo.CodigoLivro);
+
+            var dto = new BuscarEmprestimoDetalhadoDTO
+            {
+                Id = emprestimo.Id,
+                IdLeitor = emprestimo.CodigoLeitor,
+                DataInicio = emprestimo.DataEmprestimo,
+                DataDevolucao = emprestimo.DataDevolucao,
+                Status = emprestimo.Status,
+                Livro = livro
+            };
+
+            return new DetalheEmprestimoRespostaDTO
+            {
+                Mensagem = "Empréstimo localizado com sucesso.",
+                Emprestimo = dto
+            };
+        }
+
     }
 }

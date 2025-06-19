@@ -48,5 +48,21 @@ namespace Emprestimos.Servicos
             var response = await _http.PatchAsync($"livros/{idLivro}/status", content);
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task<LivroDTO> BuscarLivroPorId(int idLivro)
+        {
+            var response = await _http.GetAsync($"livros/{idLivro}");
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Erro ao buscar o livro no serviço de livros.");
+
+            var livro = await response.Content.ReadFromJsonAsync<LivroDTO>();
+
+            if (livro == null)
+                throw new Exception("Livro não encontrado.");
+
+            return livro;
+        }
+
     }
 }
