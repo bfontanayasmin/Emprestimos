@@ -31,6 +31,24 @@ Essa arquitetura em microsserviços permite que cada parte do sistema seja desen
 ## Rotas da API 
 
 
-__1. POST /api/livros/inserirNovo__
+__1. POST /api/emprestimo/criarEmprestimo__
 
-Cadastra um novo livro no sistema.
+Cria um novo empréstimo no sistema.
+
+__2. PATCH /api/emprestimo/{id}/devolucao__
+
+Faz a devolução do livro.
+
+__3. GET /api/emprestimo/leitor/{id}__
+
+Busca os empréstimos feitos por um leitor, indicado pelo id do leitor.
+
+__4. GET /api/emprestimo/id__
+
+Busca os emprestimos pelo id.
+
+__5. GET /api/emprestimo/leitor/{idLeitor}/emprestimo-com-livros__
+
+Busca todos os emprestimos já feitos pelo leitor.
+
+
