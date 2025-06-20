@@ -6,7 +6,7 @@ using Emprestimos.Enums;
 namespace Emprestimos.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/emprestimo")]
     public class EmprestimosController : ControllerBase
     {
         private readonly EmprestimoDomain _emprestimoDomain;
@@ -16,7 +16,7 @@ namespace Emprestimos.Controllers
             _emprestimoDomain = new EmprestimoDomain();
         }
 
-        [HttpPost]
+        [HttpPost("criarEmprestimo")]
         public async Task<IActionResult> CriarEmprestimo([FromBody] InserirEmprestimoDTO dto)
         {
             try
