@@ -85,6 +85,30 @@ namespace Emprestimos.Servicos
                 Status = e.Status
             }).ToList();
         }
+        public async Task<List<EmprestimoComNomeLivroDTO>> ListarEmprestimosPorLeitorComNomes(int idLeitor)
+        {
+            var emprestimos = _dataContext.Emprestimos
+                .Where(e => e.CodigoLeitor == idLeitor)
+                .ToList();
+
+            var resultado = new List<EmprestimoComNomeLivroDTO>();
+
+            foreach (var emprestimo in emprestimos)
+            {
+                var livro = await _livrosClient.BuscarLivroPorId(emprestimo.CodigoLivro);
+
+                resultado.Add(new EmprestimoComNomeLivroDTO
+                {
+                    IdEmprestimo = emprestimo.Id,
+                    DataInicio = emprestimo.DataEmprestimo,
+                    DataDevolucao = emprestimo.DataDevolucao,
+                    NomeLivro = livro?.Nome ?? "Livro não encontrado",
+                    Status = emprestimo.Status
+                });
+            }
+
+            return resultado;
+        }
 
         public async Task<DetalheEmprestimoRespostaDTO> BuscarEmprestimoDetalhado(int id)
         {
@@ -103,6 +127,15 @@ namespace Emprestimos.Servicos
 
             var leitoresClient = new LeitoresClient();
             var leitor = await leitoresClient.BuscarLeitorPorId(emprestimo.CodigoLeitor);
+
+            if (leitor == null)
+            {
+                return new DetalheEmprestimoRespostaDTO
+                {
+                    Mensagem = "Leitor não encontrado.",
+                    Emprestimo = null
+                };
+            }
 
             var dto = new BuscarEmprestimoDetalhadoDTO
             {

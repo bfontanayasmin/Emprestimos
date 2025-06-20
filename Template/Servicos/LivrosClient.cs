@@ -13,11 +13,11 @@ namespace Emprestimos.Servicos
         {
             _http = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:5089/api/") // porta do microserviço de livros
+                BaseAddress = new Uri("http://localhost:5089/api/") 
             };
         }
 
-        // ✅ Verifica se o livro está disponível
+       
         public async Task<bool> VerificarDisponibilidade(int idLivro)
         {
             var response = await _http.GetAsync($"livros/{idLivro}");
@@ -33,7 +33,7 @@ namespace Emprestimos.Servicos
             return livro.Disponibilidade;
         }
 
-        // ✅ Marca como emprestado (Disponibilidade = false)
+        
         public async Task MarcarComoEmprestado(int idLivro)
         {
             var content = JsonContent.Create(new { disponibilidade = false });
@@ -41,7 +41,7 @@ namespace Emprestimos.Servicos
             response.EnsureSuccessStatusCode();
         }
 
-        // ✅ Marca como devolvido (Disponibilidade = true)
+       
         public async Task MarcarComoDevolvido(int idLivro)
         {
             var content = JsonContent.Create(new { disponibilidade = true });

@@ -2,7 +2,7 @@
 {
     public class LeitorDTO
     {
-        public int IdLeitor { get; set; }
+        public int Id { get; set; }
         public string Nome { get; set; }
         public string Contato { get; set; }
      

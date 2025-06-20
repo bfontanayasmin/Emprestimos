@@ -1,16 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Emprestimos.DTO
 {
     public class LivroDTO
     {
-        [Required]
-        public int Id { get; set; }
+        [JsonPropertyName("id")]
+        public int IdLeitor { get; set; }
 
-        public required string Nome { get; set; }
-        public required string Autor { get; set; }
-        public required string CodigoISBN { get; set; }
+        [JsonPropertyName("nome")]
+        public string Nome { get; set; }
 
-        public bool Disponibilidade { get; set; }
+        [JsonPropertyName("contato")]
+        public string Contato { get; set; }
     }
 }

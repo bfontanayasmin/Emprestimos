@@ -65,12 +65,28 @@ namespace Emprestimos.Controllers
                 if (resultado.Emprestimo == null)
                     return NotFound(new { mensagem = resultado.Mensagem });
 
-                return Ok(resultado); // já retorna DetalheEmprestimoRespostaDTO corretamente
+                return Ok(resultado);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
+
+        [HttpGet("leitor/{idLeitor}/emprestimos-com-livros")]
+        public async Task<IActionResult> BuscarEmprestimosPorLeitorComNomes(int idLeitor)
+        {
+            try
+            {
+                var resultado = await _emprestimoDomain.ListarEmprestimosPorLeitorComNomes(idLeitor);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            }
+
+        }
     }
-}
+
