@@ -14,10 +14,11 @@ namespace Emprestimos.Servicos
                 BaseAddress = new Uri("http://localhost:5091/api/")
             };
         }
-
+ 
         public async Task<LeitorDTO> BuscarLeitorPorId(int id)
         {
-            var response = await _http.GetAsync($"leitores/{id}");
+            var response = await _http.GetAsync($"leitores/buscarLeitorPorId/{id}");
+
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Erro ao buscar leitor");
